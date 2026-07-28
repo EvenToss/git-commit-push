@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# commit-push / push.sh — 推送当前分支；无上游则 git push -u origin <branch>
+# git-commit-push / push.sh — 推送当前分支；无上游则 git push -u origin <branch>
 #
 # 安全特性：
 #   - 默认拒绝直推 main / master（防误操作）
@@ -13,7 +13,7 @@ branch="$(git rev-parse --abbrev-ref HEAD)"
 case "$branch" in
   main|master)
     if [ "${COMMIT_PUSH_ALLOW_MAIN:-0}" != "1" ]; then
-      echo "错误：当前分支为 ${branch}，commit-push 默认不直推主分支（git flow 规范）。" >&2
+      echo "错误：当前分支为 ${branch}，git-commit-push 默认不直推主分支（git flow 规范）。" >&2
       echo "      请切到特性分支后再推；确需推主分支设 COMMIT_PUSH_ALLOW_MAIN=1。" >&2
       exit 1
     fi

@@ -1,7 +1,7 @@
 {
-  "name": "pi-skill-commit-push",
-  "version": "1.0.0",
-  "description": "按逻辑功能拆分原子提交并自动推送的 pi skill（强制中文 feat:/fix: 规范，低 token）。注册的 skill 名为 commit-push。",
+  "name": "pi-skill-git-commit-push",
+  "version": "1.1.0",
+  "description": "按逻辑功能拆分原子提交并自动推送的 pi skill（强制中文 feat:/fix: 规范，低 token）。注册的 skill 名为 git-commit-push。",
   "private": true,
   "keywords": ["pi-package", "pi-skill", "git", "commit", "conventional-commits", "chinese"],
   "license": "MIT",

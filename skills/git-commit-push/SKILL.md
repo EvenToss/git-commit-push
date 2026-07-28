@@ -1,9 +1,9 @@
 ---
-name: commit-push
+name: git-commit-push
 description: 分析当前 git 仓库改动，按逻辑功能拆成多个原子提交（强制中文 feat:/fix:/refactor:/docs:/chore: 等前缀，无 scope），逐个 commit 后自动 git push。专为团队规范提交信息设计，用一次性脚本读取紧凑 diff 概览来极小化 token 消耗。当用户要求提交代码、commit、push、规范提交信息、整理工作区时使用。
 ---
 
-# commit-push
+# git-commit-push
 
 把当前工作区的改动 **按功能拆成多个原子提交**（中文 `feat:/fix:/...` 前缀），逐个提交后 **自动 push**。
 
@@ -11,7 +11,7 @@ description: 分析当前 git 仓库改动，按逻辑功能拆成多个原子�
 
 ## 核心原则：省 token
 
-- ✅ **只跑一次** `bash ~/.agents/skills/commit-push/scripts/analyze.sh` 拿到全部信息（统计 + 未跟踪 + unified=0 差异），据此分组写信息。
+- ✅ **只跑一次** `analyze.sh` 拿到全部信息（统计 + 未跟踪 + unified=0 差异），据此分组写信息。
 - ✅ 只有当概览不足以判断某个文件归属时，才对 **单个** 文件再 `git diff HEAD --unified=0 -- <path>`。
 - ❌ **绝不** 为了写提交信息去 `cat` / `read` 整个源码文件。
 - ❌ 不重复跑 `git status` / `git diff --stat`。
@@ -19,9 +19,19 @@ description: 分析当前 git 仓库改动，按逻辑功能拆成多个原子�
 
 ## 标准工作流
 
+### 0. 定位 skill 目录（兼容 clone 与 pi install 两种安装位置）
+脚本位于本 SKILL.md 同目录下的 `scripts/`。先设好 `SD`，**并保持当前项目目录为 CWD**——脚本里的 git 命令会作用于你的项目仓库，而不是 skill 自身的仓库：
+```bash
+SD="$(for b in "$HOME/.agents/skills" "$HOME/.pi/agent" "$HOME/.pi" ".pi"; do
+        [ -d "$b" ] && find "$b" -maxdepth 8 -type f -name SKILL.md -path '*git-commit-push*' 2>/dev/null
+      done | head -1)"
+SD="$(dirname "$SD")"; [ -n "$SD" ] || { echo "找不到 git-commit-push skill 目录" >&2; exit 1; }
+```
+> 你刚才 read 本 SKILL.md 时绝对路径已在上下文里，直接 `SD="<SKILL.md 所在目录>"` 跳过查找也可。
+
 ### 1. 分析改动（一次脚本调用）
 ```bash
-bash ~/.agents/skills/commit-push/scripts/analyze.sh
+bash "$SD/scripts/analyze.sh"
 ```
 若输出「工作区干净」则直接结束，告诉用户没有可提交的改动。
 
@@ -31,7 +41,7 @@ bash ~/.agents/skills/commit-push/scripts/analyze.sh
 ### 3. 逐组提交（显式路径，禁止 git add -A）
 对每一组：
 ```bash
-bash ~/.agents/skills/commit-push/scripts/commit-group.sh \
+bash "$SD/scripts/commit-group.sh" \
   "feat: 运单轨迹增加按司机筛选" \
   admin/apps/web-antdv-next/src/views/freight/waybilltrack/index.vue \
   server/huoyun-module-freight/src/main/java/com/huoyuntong/module/freight/controller/admin/waybilltrack/WaybillTrackController.java
@@ -39,13 +49,13 @@ bash ~/.agents/skills/commit-push/scripts/commit-group.sh \
 可选 body（作为第二个 `-m`）：
 ```bash
 COMMIT_BODY="按企业 + 司机筛选，新增分页参数" \
-  bash ~/.agents/skills/commit-push/scripts/commit-group.sh "feat: ..." <paths...>
+  bash "$SD/scripts/commit-group.sh" "feat: ..." <paths...>
 ```
 > 等价原生命令：`git add -- <paths> && git commit -m "<type>: <简述>" [-m "body"]`
 
 ### 4. 推送
 ```bash
-bash ~/.agents/skills/commit-push/scripts/push.sh
+bash "$SD/scripts/push.sh"
 ```
 无上游自动 `git push -u origin <branch>`；默认拒绝直推 main/master。
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# commit-push / analyze.sh — 一次性输出紧凑改动概览，供分组写提交信息
+# git-commit-push / analyze.sh — 一次性输出紧凑改动概览，供分组写提交信息
 #
 # 设计目标：用「一次脚本调用」拿到分组所需的全部信息，
 # 避免模型多次 cat / git diff 烧 token。模型据此分组即可，无需再读整个源码文件。
@@ -26,7 +26,7 @@ if u="$(git rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null || tr
 fi
 
 echo "══════════════════════════════════════════════════════════════"
-echo " commit-push · 改动分析"
+echo " git-commit-push · 改动分析"
 echo "══════════════════════════════════════════════════════════════"
 echo "分支:   $branch"
 if [ -n "$upstream" ]; then

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# commit-push / commit-group.sh — 用「显式路径」暂存并提交一个原子改动组
+# git-commit-push / commit-group.sh — 用「显式路径」暂存并提交一个原子改动组
 #
 # 用法: commit-group.sh "<type>: <中文简述>" <path1> [path2 ...]
 # 可选 body:  COMMIT_BODY="简短补充" commit-group.sh "..." <paths...>
