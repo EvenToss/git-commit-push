@@ -19,6 +19,7 @@
 - 🔪 **按功能拆分**：同功能前后端合一；配置单独 `chore`/`build`；脚本给出 `suggest-groups`。
 - 🇨🇳 **强制中文规范信息**：`feat/fix/docs/style/refactor/perf/test/build/ci/chore/revert`，无 scope。
 - 🚀 **提交后自动 push**（可关）。
+- 默认优先使用 **SSH 远程推送**（标准 HTTP(S) remote 会自动转 SSH，适用于 GitHub / GitLab / Gitee）。
 - 可选集成 git-ship：创建 PR 并 `squash merge`（带确认门禁）。
 - 💸 **极低 token**：结构化概览（name-status / 信号样例 / 新文件预览），禁止读整文件。
 - 🛡️ **安全默认**：显式路径、垃圾跳过、密钥 WARN、拒推 main/master、冲突即停、消息格式校验。
@@ -36,7 +37,7 @@
 
 ```bash
 pi install git:github.com/EvenToss/git-commit-push
-pi install git:github.com/EvenToss/git-commit-push@v1.2.0
+pi install git:github.com/EvenToss/git-commit-push@v1.3.0
 pi update  git:github.com/EvenToss/git-commit-push
 pi remove  git:github.com/EvenToss/git-commit-push
 ```
@@ -69,7 +70,7 @@ pi install -l git:github.com/EvenToss/git-commit-push
 | 变量 | 默认 | 作用 |
 |---|---|---|
 | `COMMIT_PUSH_ALLOW_MAIN` | `0` | `1` 允许直推 main/master |
-| `COMMIT_PUSH_REMOTE` | `origin` | 远程名 |
+| `COMMIT_PUSH_REMOTE` | `origin` | 远程名（默认优先用其 SSH URL 推送） |
 | `COMMIT_BODY` | _(空)_ | commit 第二个 `-m` |
 | `COMMIT_DRY_RUN` | `0` | `1` 或 `--dry-run` 只演练不提交 |
 | `ANALYZE_PREVIEW_LINES` | `20` | 新文件预览行数 |
@@ -98,7 +99,7 @@ Ship（可选）额外环境变量：
 
 - 永远 `git add -- <显式路径>`
 - 产物与疑似密钥默认跳过
-- 拒绝直推 main/master；push 被拒（如 non-fast-forward）则建议先 `git pull --rebase`
+- 拒绝直推 main/master；默认优先走 SSH；push 被拒（如 non-fast-forward）则建议先 `git pull --rebase`
 - 提交信息格式校验；钩子失败打印完整输出
 
 ## License

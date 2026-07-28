@@ -59,7 +59,7 @@ bash "$SD/scripts/commit-group.sh" --dry-run "feat: ..." path1
 ```bash
 bash "$SD/scripts/push.sh"
 ```
-默认拒推 `main`/`master`；若推送被拒（如 non-fast-forward），建议先 `git pull --rebase` 再重试。
+默认拒推 `main`/`master`；默认优先走 SSH（标准 HTTP(S) remote 会自动转 `git@host:path.git`，适用于 GitHub / GitLab / Gitee）；若推送被拒（如 non-fast-forward），建议先 `git pull --rebase` 再重试。
 
 ### 4.5（可选）Ship：创建 PR 并 squash merge（借鉴 git-ship）
 仅当用户明确表达“发布/提 PR 并合并/ship”意图，且你确认仓库允许 squash merge 时才启用。
@@ -103,7 +103,7 @@ bash "$SD/scripts/ship-pr.sh"
 | 空提交 | 跳过 |
 | 只 commit 不 push | 做完第 3 步即可 |
 
-环境变量：`COMMIT_PUSH_REMOTE`、`COMMIT_BODY`、`COMMIT_DRY_RUN=1`。
+环境变量：`COMMIT_PUSH_REMOTE`（默认优先使用其 SSH URL 推送）、`COMMIT_BODY`、`COMMIT_DRY_RUN=1`。
 
 Ship 额外环境变量：
 - `COMMIT_SHIP_CONFIRM=1`：确认门禁（必须）

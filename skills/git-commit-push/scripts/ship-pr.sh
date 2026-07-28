@@ -14,6 +14,25 @@
 
 set -euo pipefail
 
+to_ssh_url() {
+  case "$1" in
+    git@*:*|ssh://*)
+      printf '%s\n' "$1"
+      ;;
+    https://*/*|http://*/*)
+      local raw="${1#http://}"
+      raw="${raw#https://}"
+      local host="${raw%%/*}"
+      local repo="${raw#*/}"
+      repo="${repo%.git}"
+      printf 'git@%s:%s.git\n' "$host" "$repo"
+      ;;
+    *)
+      printf '%s\n' "$1"
+      ;;
+  esac
+}
+
 git rev-parse --is-inside-work-tree >/dev/null 2>&1 || {
   echo "ERROR: not a git repo" >&2
   exit 2
@@ -51,6 +70,18 @@ if [ -n "$untracked" ]; then
 fi
 
 remote="${COMMIT_SHIP_REMOTE:-${COMMIT_PUSH_REMOTE:-origin}}"
+remote_url="$(git remote get-url "$remote" 2>/dev/null || true)"
+
+if [ -z "$remote_url" ]; then
+  echo "ERROR: 找不到远程 ${remote}。请检查 git remote -v。" >&2
+  exit 1
+fi
+
+push_target="$(to_ssh_url "$remote_url")"
+remote_label="$remote"
+if [ "$push_target" != "$remote_url" ]; then
+  remote_label="${remote} (SSH)"
+fi
 
 base="${COMMIT_SHIP_BASE:-}"
 if [ -z "$base" ]; then
@@ -82,11 +113,11 @@ fi
 echo "## ship plan"
 echo "  Branch: ${branch}"
 echo "  Base:   ${base}"
-echo "  Remote: ${remote}"
+echo "  Remote: ${remote_label}"
 
 echo "## sync base (fetch only)"
-git fetch "$remote" "$base" >/dev/null 2>&1 || {
-  echo "ERROR: git fetch ${remote} ${base} 失败。" >&2
+git fetch "$push_target" "$base" >/dev/null 2>&1 || {
+  echo "ERROR: git fetch ${remote_label} ${base} 失败。" >&2
   exit 1
 }
 
