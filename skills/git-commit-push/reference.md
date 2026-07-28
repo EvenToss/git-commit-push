@@ -73,7 +73,6 @@ COMMIT_BODY="- 点1" bash commit-group.sh "feat: 简述" p1
 
 bash push.sh
 COMMIT_PUSH_ALLOW_MAIN=1 bash push.sh          # 允许主分支
-COMMIT_PUSH_REBASE=1 bash push.sh               # 落后时先 rebase
 COMMIT_PUSH_REMOTE=upstream bash push.sh
 ```
 

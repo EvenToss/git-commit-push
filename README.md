@@ -18,7 +18,8 @@
 
 - 🔪 **按功能拆分**：同功能前后端合一；配置单独 `chore`/`build`；脚本给出 `suggest-groups`。
 - 🇨🇳 **强制中文规范信息**：`feat/fix/docs/style/refactor/perf/test/build/ci/chore/revert`，无 scope。
-- 🚀 **提交后自动 push**（可关）；落后上游可 `COMMIT_PUSH_REBASE=1`。
+- 🚀 **提交后自动 push**（可关）。
+- 可选集成 git-ship：创建 PR 并 `squash merge`（带确认门禁）。
 - 💸 **极低 token**：结构化概览（name-status / 信号样例 / 新文件预览），禁止读整文件。
 - 🛡️ **安全默认**：显式路径、垃圾跳过、密钥 WARN、拒推 main/master、冲突即停、消息格式校验。
 
@@ -61,7 +62,7 @@ pi install -l git:github.com/EvenToss/git-commit-push
 - `/skill:git-commit-push`
 - 或：「提交推送一下」「commit 这些改动」
 
-流程：**analyze → 确认分组 → 逐组 commit → push → 一行汇报**。
+流程：**analyze → 确认分组 → 逐组 commit → push →（可选 ship PR）→ 一行汇报**。
 
 ## 配置（环境变量）
 
@@ -69,11 +70,17 @@ pi install -l git:github.com/EvenToss/git-commit-push
 |---|---|---|
 | `COMMIT_PUSH_ALLOW_MAIN` | `0` | `1` 允许直推 main/master |
 | `COMMIT_PUSH_REMOTE` | `origin` | 远程名 |
-| `COMMIT_PUSH_REBASE` | `0` | `1` 落后上游时先 `pull --rebase` 再推 |
 | `COMMIT_BODY` | _(空)_ | commit 第二个 `-m` |
 | `COMMIT_DRY_RUN` | `0` | `1` 或 `--dry-run` 只演练不提交 |
 | `ANALYZE_PREVIEW_LINES` | `20` | 新文件预览行数 |
 | `ANALYZE_PER_FILE_SIGNAL` | `8` | 每文件信号行上限 |
+
+Ship（可选）额外环境变量：
+- `COMMIT_SHIP_CONFIRM=1`：开启 PR 创建与 squash merge（必填，防止误触发）
+- `COMMIT_SHIP_BASE`：主分支名（默认自动探测 main/master）
+- `COMMIT_SHIP_REMOTE`：远程名（默认取 `COMMIT_PUSH_REMOTE` 或 `origin`）
+- `COMMIT_SHIP_VALIDATE_CMD`：可选验证命令（失败会停止，不 merge）
+- `COMMIT_SHIP_ADMIN=1`：可选；给 `gh pr merge` 增加 `--admin`
 
 ## 自定义
 
@@ -91,7 +98,7 @@ pi install -l git:github.com/EvenToss/git-commit-push
 
 - 永远 `git add -- <显式路径>`
 - 产物与疑似密钥默认跳过
-- 拒绝直推 main/master；落后上游拒绝（除非 rebase）
+- 拒绝直推 main/master；push 被拒（如 non-fast-forward）则建议先 `git pull --rebase`
 - 提交信息格式校验；钩子失败打印完整输出
 
 ## License
