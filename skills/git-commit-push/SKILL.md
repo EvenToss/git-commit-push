@@ -1,6 +1,6 @@
 ---
 name: git-commit-push
-description: 分析当前 git 仓库改动，按逻辑功能拆成多个原子提交（强制中文 feat:/fix:/refactor:/docs:/chore: 等前缀，无 scope），逐个 commit 后自动 git push。专为团队规范提交信息设计，用一次性脚本读取紧凑 diff 概览来极小化 token 消耗。当用户要求提交代码、commit、push、规范提交信息、整理工作区时使用。
+description: "分析当前 git 仓库改动，按逻辑功能拆成多个原子提交（强制中文 feat:/fix:/refactor:/docs:/chore: 等前缀，无 scope），逐个 commit 后自动 git push。专为团队规范提交信息设计，用一次性脚本读取紧凑 diff 概览来极小化 token 消耗。当用户要求提交代码、commit、push、规范提交信息、整理工作区时使用。"
 ---
 
 # git-commit-push
