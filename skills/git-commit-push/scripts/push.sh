@@ -3,7 +3,6 @@
 #
 # 安全:
 #   - 默认拒绝直推 main / master
-#   - 落后上游时默认拒绝；COMMIT_PUSH_REBASE=1 则先 pull --rebase 再推
 #   - 远程名可用 COMMIT_PUSH_REMOTE 覆盖（默认 origin）
 #   - 需强制推送主分支：COMMIT_PUSH_ALLOW_MAIN=1
 #   - 失败时分类提示，避免模型乱试命令
@@ -24,26 +23,10 @@ esac
 
 remote="${COMMIT_PUSH_REMOTE:-origin}"
 
-# 落后检测（有上游时）
 if git rev-parse --abbrev-ref --symbolic-full-name '@{u}' >/dev/null 2>&1; then
-  ab="$(git rev-list --left-right --count '@{u}...HEAD' 2>/dev/null || printf '0\t0')"
-  behind="${ab%%$'\t'*}"; ahead="${ab##*$'\t'}"
-  if [ "${behind:-0}" -gt 0 ]; then
-    if [ "${COMMIT_PUSH_REBASE:-0}" = "1" ]; then
-      echo "→ 落后上游 ${behind} 个提交，执行 git pull --rebase"
-      if ! git pull --rebase; then
-        echo "错误：pull --rebase 失败。请手动解决冲突后重试 push.sh。" >&2
-        exit 1
-      fi
-    else
-      echo "错误：落后上游 ${behind} 个提交（本地 ahead ${ahead}），拒绝 push 以免 non-fast-forward。" >&2
-      echo "      先: git pull --rebase   或设 COMMIT_PUSH_REBASE=1 让本脚本自动 rebase 再推。" >&2
-      exit 1
-    fi
-  fi
-  echo "→ git push"
+  echo "→ git push ${remote} ${branch}"
   set +e
-  out="$(git push 2>&1)"
+  out="$(git push "$remote" "$branch" 2>&1)"
   ec=$?
   set -e
 else
@@ -59,7 +42,7 @@ if [ "$ec" -ne 0 ]; then
   echo "----" >&2
   case "$out" in
     *non-fast-forward*|*rejected*|*fetch\ first*)
-      echo "提示：推送被拒（non-fast-forward）。先 git pull --rebase，或 COMMIT_PUSH_REBASE=1 bash push.sh。" >&2
+      echo "提示：推送被拒（non-fast-forward）。先 git pull --rebase，再重试。" >&2
       ;;
     *Authentication*|*Permission*|*could\ not\ read\ Username*|*403*|*401*)
       echo "提示：认证失败。检查 SSH key / gh auth / 远程权限。" >&2

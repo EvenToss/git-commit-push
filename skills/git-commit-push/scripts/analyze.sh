@@ -100,26 +100,6 @@ if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
 fi
 
 repo_root="$(git rev-parse --show-toplevel)"
-branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo '?')"
-
-upstream=""
-ahead=0
-behind=0
-if u="$(git rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null || true)"; then
-  if [ -n "$u" ]; then
-    upstream="$u"
-    ab="$(git rev-list --left-right --count '@{u}...HEAD' 2>/dev/null || printf '0\t0')"
-    behind="${ab%%$'\t'*}"; ahead="${ab##*$'\t'}"
-  fi
-fi
-
-echo "# git-commit-push analyze"
-echo "branch: $branch"
-if [ -n "$upstream" ]; then
-  echo "upstream: $upstream ahead=$ahead behind=$behind"
-else
-  echo "upstream: (none — push will use -u origin <branch>)"
-fi
 echo "root: $repo_root"
 echo
 
